@@ -1,11 +1,11 @@
 #[macro_use]
 extern crate clap;
 use clap::App;
+use std::fs::{create_dir, File, OpenOptions};
 use std::io;
-use std::io::{Read, Write, Seek, SeekFrom};
-use std::process::{Command, Output};
-use std::fs::{File, OpenOptions, create_dir};
+use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::Path;
+use std::process::{Command, Output};
 
 fn main() {
     let yaml = load_yaml!("gemino.yaml");
@@ -15,11 +15,11 @@ fn main() {
         match matches.value_of("project") {
             Some(folder) => {
                 handle_new_project(&folder);
-            },
+            }
             None => {
                 println!("Please provide a folder");
                 return;
-            },
+            }
         }
     }
 }
@@ -69,9 +69,11 @@ fn create_project_folder(folder: &str) -> std::io::Result<()> {
 fn create_babel_config(folder: &str) -> std::io::Result<File> {
     let mut file = File::create(Path::new(format!("{}/babel.config.js", folder).as_str()))?;
 
-    file.write_all(b"const baseBabelConfig = require('../../babel.config');
+    file.write_all(
+        b"const baseBabelConfig = require('../../babel.config');
 
-module.exports = { ...baseBabelConfig };")?;
+module.exports = { ...baseBabelConfig };",
+    )?;
     file.sync_all()?;
 
     Ok(file)
@@ -80,9 +82,11 @@ module.exports = { ...baseBabelConfig };")?;
 fn create_jest_config(folder: &str) -> std::io::Result<File> {
     let mut file = File::create(Path::new(format!("{}/jest.config.js", folder).as_str()))?;
 
-    file.write_all(b"const baseJestConfig = require('../../jest.config');
+    file.write_all(
+        b"const baseJestConfig = require('../../jest.config');
 
-module.exports = { ...baseJestConfig };")?;
+module.exports = { ...baseJestConfig };",
+    )?;
     file.sync_all()?;
 
     Ok(file)
@@ -92,10 +96,7 @@ fn create_package_json(folder: &str) -> std::io::Result<Output> {
     use std::env;
     env::set_current_dir(Path::new(folder))?;
 
-    let command = Command::new("yarn")
-        .arg("init")
-        .arg("-yp")
-        .output()?;
+    let command = Command::new("yarn").arg("init").arg("-yp").output()?;
 
     Ok(command)
 }
@@ -109,17 +110,22 @@ fn insert_test_script() -> std::io::Result<File> {
 
     let mut buf = String::new();
 
-    file.read_to_string(&mut buf).expect("Failed to open package.json");
+    file.read_to_string(&mut buf)
+        .expect("Failed to open package.json");
     file.set_len(0).expect("failed to truncate");
 
     file.seek(SeekFrom::Start(0))?;
 
-    let modified_buf = buf.replace("\"private\": true,", "\"private\": true,
+    let modified_buf = buf.replace(
+        "\"private\": true,",
+        "\"private\": true,
   \"scripts\": {
     \"test\": \"./node_modules/.bin/jest\"
-  },");
+  },",
+    );
 
-    file.write_all(modified_buf.as_bytes()).expect("failed to write");
+    file.write_all(modified_buf.as_bytes())
+        .expect("failed to write");
     file.sync_all().expect("failed to sync");
 
     Ok(file)
@@ -128,9 +134,11 @@ fn insert_test_script() -> std::io::Result<File> {
 fn create_index_file(folder: &str) -> std::io::Result<File> {
     let mut file = File::create(Path::new(format!("{}/index.js", folder).as_str()))?;
 
-    file.write_all(b"import App from './src/App';
+    file.write_all(
+        b"import App from './src/App';
 
-export default App;")?;
+export default App;",
+    )?;
     file.sync_all()?;
 
     Ok(file)
@@ -139,7 +147,8 @@ export default App;")?;
 fn create_example_component(folder: &str) -> std::io::Result<File> {
     let mut file = File::create(Path::new(format!("{}/src/App.js", folder).as_str()))?;
 
-    file.write_all(b"import React from 'react';
+    file.write_all(
+        b"import React from 'react';
 import Template from '@chewy/react-template';
 
 const App = props => (
@@ -150,7 +159,8 @@ const App = props => (
     </Template>
 );
 
-export default App;")?;
+export default App;",
+    )?;
     file.sync_all()?;
 
     Ok(file)
@@ -159,7 +169,8 @@ export default App;")?;
 fn create_example_test(folder: &str) -> std::io::Result<File> {
     let mut file = File::create(Path::new(format!("{}/src/App.test.js", folder).as_str()))?;
 
-    file.write_all(b"import App from './App';
+    file.write_all(
+        b"import App from './App';
 
 describe('<App />', () => {
     const element = testComponent(App);
@@ -169,7 +180,8 @@ describe('<App />', () => {
     test(\"it should render hello\", () => {
         expect(element()).toHaveText('Hello World');
     });
-});")?;
+});",
+    )?;
     file.sync_all()?;
 
     Ok(file)
@@ -182,7 +194,9 @@ fn yarn_install_package(package: &str, dev_only: bool) -> std::io::Result<Output
     command.arg(package);
     command.arg("--exact");
 
-    if dev_only { command.arg("--dev"); }
+    if dev_only {
+        command.arg("--dev");
+    }
 
     Ok(command.output()?)
 }
@@ -198,8 +212,8 @@ fn package_install(package: &str) -> std::io::Result<Output> {
 #[cfg(test)]
 mod test {
     use super::handle_new_project;
-    use std::path::Path;
     use std::fs::remove_dir_all;
+    use std::path::Path;
 
     const TEST_PROJECT: &str = "project";
 
@@ -213,10 +227,22 @@ mod test {
     fn it_creates_a_project_directory() {
         handle_new_project(TEST_PROJECT);
         assert!(Path::new(TEST_PROJECT).exists(), "Directory does not exist");
-        assert!(Path::new(format!("{}/babel.config.js", TEST_PROJECT).as_str()).exists(), "Babel config does not exist");
-        assert!(Path::new(format!("{}/jest.config.js", TEST_PROJECT).as_str()).exists(), "Jest config does not exist");
-        assert!(Path::new(format!("{}/package.json", TEST_PROJECT).as_str()).exists(), "Jest config does not exist");
-        assert!(Path::new(format!("{}/index.js", TEST_PROJECT).as_str()).exists(), "index.js does not exist");
+        assert!(
+            Path::new(format!("{}/babel.config.js", TEST_PROJECT).as_str()).exists(),
+            "Babel config does not exist"
+        );
+        assert!(
+            Path::new(format!("{}/jest.config.js", TEST_PROJECT).as_str()).exists(),
+            "Jest config does not exist"
+        );
+        assert!(
+            Path::new(format!("{}/package.json", TEST_PROJECT).as_str()).exists(),
+            "Jest config does not exist"
+        );
+        assert!(
+            Path::new(format!("{}/index.js", TEST_PROJECT).as_str()).exists(),
+            "index.js does not exist"
+        );
         clean_up();
     }
 }
