@@ -7,6 +7,7 @@ jobs:
         steps:
             - run: curl https://sh.rustup.rs -sSf | sh -s -- -y
             - run: export PATH="$HOME/.cargo/bin:$PATH"
+            - run: echo $PATH
             - run:
                 name: "Verify Rust installation"
                 command: rustc --version
