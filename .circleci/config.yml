@@ -1,0 +1,21 @@
+version: 2
+
+jobs:
+    test:
+        docker:
+            - image: rust:1
+        steps:
+            - checkout
+            - run: cargo generate-lockfile
+            - restore-cache:
+                keys:
+                    - v1-cargo-cache-{{ checksum "Cargo.lock" }}
+            - run: cargo build --all --all-targets
+            - save_cache:
+                paths:
+                    - /usr/local/cargo/registry
+                    - target/debug/.fingerprint
+                    - target/debug/build
+                    - target/debug/deps
+                key: v1-cargo-cache-{{ checksum "Cargo.lock" }}
+            - run: cargo test --all
