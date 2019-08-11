@@ -5,7 +5,7 @@ jobs:
         docker:
             - image: node
         steps:
-            - run: curl https://sh.rustup.rs -sSf | sh
+            - run: curl https://sh.rustup.rs -sSf | sh -s -- -y
             - run: rustup install stable
             - run: rustup component add rustfmt
             - checkout
