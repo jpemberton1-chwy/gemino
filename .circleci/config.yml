@@ -6,8 +6,7 @@ jobs:
             - image: node
         steps:
             - run: curl https://sh.rustup.rs -sSf | sh -s -- -y
-            - run: rustup install stable
-            - run: rustup component add rustfmt
+            - run: source ~/.profile
             - checkout
             - run: cargo generate-lockfile
             - restore-cache:
