@@ -3,11 +3,11 @@ version: 2
 jobs:
     build:
         docker:
-            - image: rust:1
+            - image: node
         steps:
-            - run:
-                name: "Install Yarn"
-                command: curl -o- -L https://yarnpkg.com/install.sh | bash
+            - run: curl https://sh.rustup.rs -sSf | sh
+            - run: rustup install stable
+            - run: rustup component add rustfmt
             - checkout
             - run: cargo generate-lockfile
             - restore-cache:
