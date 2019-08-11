@@ -6,7 +6,9 @@ jobs:
             - image: node
         steps:
             - run: curl https://sh.rustup.rs -sSf | sh -s -- -y
-            - run: source ~/.profile
+            - run:
+                name: "Verify Rust installation"
+                command: rustc --version
             - checkout
             - run: cargo generate-lockfile
             - restore-cache:
