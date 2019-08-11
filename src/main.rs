@@ -215,7 +215,7 @@ mod test {
     use std::fs::remove_dir_all;
     use std::path::Path;
 
-    const TEST_PROJECT: &str = "project";
+    const TEST_PROJECT: &str = "/tmp/test-project";
 
     fn clean_up() {
         let result = remove_dir_all(TEST_PROJECT);

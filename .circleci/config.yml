@@ -3,14 +3,15 @@ version: 2
 jobs:
     build:
         docker:
-            - image: rust:1
+            - image: node
         steps:
+            - run: curl https://sh.rustup.rs -sSf | sh -s -- -y
             - checkout
-            - run: cargo generate-lockfile
+            - run: ~/.cargo/bin/cargo generate-lockfile
             - restore-cache:
                 keys:
                     - v1-cargo-cache-{{ checksum "Cargo.lock" }}
-            - run: cargo build --all --all-targets
+            - run: ~/.cargo/bin/cargo build --all --all-targets
             - save_cache:
                 paths:
                     - /usr/local/cargo/registry
@@ -18,4 +19,4 @@ jobs:
                     - target/debug/build
                     - target/debug/deps
                 key: v1-cargo-cache-{{ checksum "Cargo.lock" }}
-            - run: cargo test --all
+            - run: ~/.cargo/bin/cargo test --all
