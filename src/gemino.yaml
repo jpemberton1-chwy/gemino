@@ -1,0 +1,13 @@
+name: gemino
+version: "0.1.0"
+author: "Chewy Team <support@chewy.com>"
+about: "Handles development chores for React apps"
+subcommands:
+    - new:
+        about: "scaffolds a new SPA"
+        version: "0.1.0"
+        author: "Chewy Team <support@chewy.com>"
+        args:
+            - project:
+                index: 1
+                help: "build a new app in folder <name>"
