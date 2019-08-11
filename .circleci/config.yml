@@ -5,6 +5,9 @@ jobs:
         docker:
             - image: rust:1
         steps:
+            - run:
+                name: "Install Yarn"
+                command: curl -o- -L https://yarnpkg.com/install.sh | bash
             - checkout
             - run: cargo generate-lockfile
             - restore-cache:
